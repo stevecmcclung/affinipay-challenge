@@ -1,0 +1,21 @@
+// Mainly extending bootstrap semantically
+
+.word-list {
+  @extend .card;
+
+  &__header {
+    @extend .card-header;
+  }
+
+  &__body {
+    @extend .card-body;
+  }
+}
+
+.word {
+  margin: $default-margin;
+
+  &--visited {
+    font-weight: bold;
+  }
+}
