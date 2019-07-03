@@ -10,7 +10,7 @@ class Word extends Component {
     isActive: false,
     visited: false,
     localDefinition: null,
-    isLoading: this.props.preload,
+    isLoading: this.props.preload ? true : false,
     isError: false
   };
 
@@ -44,6 +44,8 @@ class Word extends Component {
 
   /**
    * We will call this in a couple of different places depending on preload prop
+   * To improve: this could be a util method that returns null in the event of an error.
+   * Also more declarative way - use componentDidCatch instead of try/catch
    */
   fetchData = async url => {
     let definition = null;
