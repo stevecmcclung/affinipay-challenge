@@ -18,9 +18,9 @@ class Word extends Component {
    * Using this hook when preloading data for each word
    */
   async componentDidMount() {
-    const { word, url, preload } = this.props;
+    const { url, preload } = this.props;
     if (preload) {
-      const localDefinition = await this.fetchData(url(word.term));
+      const localDefinition = await this.fetchData(url);
       this.setState({ localDefinition, isLoading: false });
     }
   }
@@ -35,9 +35,9 @@ class Word extends Component {
     // Toggle button variant
     this.setState({ isActive, visited: true });
 
-    // If loading defs on clicks, do a lookup on "open" clicks
+    // If loading defs on clicks, do a lookup on "open" clicks (only look-up if no cached definition)
     if (!preload && isActive && !word.definition) {
-      const definitionData = await this.fetchData(url(word.term));
+      const definitionData = await this.fetchData(url);
       onLookup(word._id, definitionData);
     }
   };
@@ -45,17 +45,13 @@ class Word extends Component {
   /**
    * We will call this in a couple of different places depending on preload prop
    * To improve: this could be a util method that returns null in the event of an error.
-   * Also more declarative way - use componentDidCatch instead of try/catch
    */
-  fetchData = async url => {
-    let definition = null;
-    try {
-      const { data } = await Axios.get(url);
-      definition = data[0].meaning;
-    } catch (e) {
-      this.setState({ isError: true });
-    }
-    return definition;
+  fetchData = url => {
+    return Axios.get(url)
+      .then(({ data }) => data[0].meaning)
+      .catch(() => {
+        this.setState({ isError: true });
+      });
   };
 
   /**
@@ -122,7 +118,7 @@ class Word extends Component {
 
 // A bit of type checking for good measure
 Word.propTypes = {
-  url: PropTypes.func.isRequired,
+  url: PropTypes.string.isRequired,
   word: PropTypes.object.isRequired,
   preload: PropTypes.bool,
   onLookup: PropTypes.func.isRequired
