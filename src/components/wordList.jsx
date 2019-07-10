@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { getWords } from "../services/fakeWordsService";
-import getUrl from "../utils/api";
+import defUrl from "../utils/api";
 import Word from "./word";
 
 class Words extends Component {
@@ -12,14 +12,15 @@ class Words extends Component {
   };
 
   async componentDidMount() {
+    // Words in local state are now objects and have: id, term, definition.
     const words = getWords();
     this.setState({ words });
   }
 
   /**
-   * Save definition to our in-memory service object
+   * Save definition to its word in local state
    */
-  handleCacheWord = (id, def) => {
+  handleCacheDefinition = (id, def) => {
     const words = [...this.state.words];
     const targetWord = words.find(w => w._id === id);
     targetWord.definition = def;
@@ -34,10 +35,10 @@ class Words extends Component {
           {this.state.words.map(word => (
             <Word
               key={word._id}
-              url={getUrl}
+              url={defUrl(word.term)}
               word={word}
               preload={false}
-              onLookup={this.handleCacheWord}
+              onLookup={this.handleCacheDefinition}
             />
           ))}
         </div>
