@@ -10,7 +10,7 @@ class Word extends Component {
     isActive: false,
     visited: false,
     localDefinition: null,
-    isLoading: this.props.preload ? true : false,
+    isLoading: this.props.shouldPreload ? true : false,
     isError: false
   };
 
@@ -18,8 +18,8 @@ class Word extends Component {
    * Using this hook when preloading data for each word
    */
   async componentDidMount() {
-    const { url, preload } = this.props;
-    if (preload) {
+    const { url, shouldPreload } = this.props;
+    if (shouldPreload) {
       const localDefinition = await this.fetchData(url);
       this.setState({ localDefinition, isLoading: false });
     }
@@ -29,21 +29,21 @@ class Word extends Component {
    * Note: I only need async here in the event that we are loading data on click
    */
   handleClick = async () => {
-    const { word, url, onLookup, preload } = this.props;
+    const { word, url, onLookup, shouldPreload } = this.props;
     const isActive = !this.state.isActive;
 
     // Toggle button variant
     this.setState({ isActive, visited: true });
 
     // If loading defs on clicks, do a lookup on "open" clicks (only look-up if no cached definition)
-    if (!preload && isActive && !word.definition) {
+    if (!shouldPreload && isActive && !word.definition) {
       const definitionData = await this.fetchData(url);
       onLookup(word._id, definitionData);
     }
   };
 
   /**
-   * We will call this in a couple of different places depending on preload prop
+   * We will call this in a couple of different places depending on shouldPreload prop
    * To improve: this could be a util method that returns null in the event of an error.
    */
   fetchData = url => {
@@ -85,12 +85,12 @@ class Word extends Component {
   };
 
   render() {
-    const { word, preload } = this.props;
+    const { word, shouldPreload } = this.props;
     const { localDefinition, isLoading, visited } = this.state;
     const wordClass = visited ? "word word--visited" : "word";
 
     // The definition can come from either local state or props
-    const definition = preload ? localDefinition : word.definition;
+    const definition = shouldPreload ? localDefinition : word.definition;
 
     const popover = (
       <Popover id="popover-basic" title={word.term}>
@@ -120,7 +120,7 @@ class Word extends Component {
 Word.propTypes = {
   url: PropTypes.string.isRequired,
   word: PropTypes.object.isRequired,
-  preload: PropTypes.bool,
+  shouldPreload: PropTypes.bool,
   onLookup: PropTypes.func.isRequired
 };
 
