@@ -5,6 +5,15 @@
 
   &__header {
     @extend .card-header;
+
+    &__title {
+      display: inline-block;
+    }
+
+    &__search {
+      margin-left: 20px;
+      display: inline-block;
+    }
   }
 
   &__body {
